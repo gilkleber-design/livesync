@@ -84,7 +84,7 @@ export default function MessageInput({ roomId, userId, broadcast }: Props) {
             onKeyDown={handleKeyDown}
             placeholder="Escreva uma mensagem… ou use /ai para consultar a IA"
             rows={1}
-            className="w-full resize-none px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-sm leading-relaxed"
+            className="w-full resize-none px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-base sm:text-sm leading-relaxed"
             style={{ minHeight: '44px', maxHeight: '120px' }}
           />
         </div>
