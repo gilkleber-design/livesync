@@ -205,7 +205,7 @@ export default function Sidebar({ rooms: initialRooms, currentUserId }: Props) {
                     </button>
 
                     {/* Menu dono */}
-                    {room.owner_id === currentUserId && (
+                    {(!room.owner_id || room.owner_id === currentUserId) && (
                       <div className="relative">
                         <button
                           onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === room.id ? null : room.id) }}
