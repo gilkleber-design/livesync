@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
 type Props = {
   roomId: string
   userId: string
+  broadcast: (event: string, payload: Record<string, unknown>) => void
 }
 
-export default function MessageInput({ roomId, userId }: Props) {
+export default function MessageInput({ roomId, userId, broadcast }: Props) {
   const [text, setText] = useState('')
   const [loadingAI, setLoadingAI] = useState(false)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const emitTyping = useCallback(() => {
+    broadcast('typing', { userId })
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+    typingTimeoutRef.current = setTimeout(() => {}, 2500)
+  }, [broadcast, userId])
 
   async function sendRegularMessage(content: string) {
     const supabase = createClient()
@@ -25,6 +33,7 @@ export default function MessageInput({ roomId, userId }: Props) {
 
   async function requestAI() {
     setLoadingAI(true)
+    broadcast('ai_thinking', { userId, active: true })
     try {
       const res = await fetch('/api/ai', {
         method: 'POST',
@@ -34,7 +43,10 @@ export default function MessageInput({ roomId, userId }: Props) {
       if (!res.ok) {
         const data = await res.json()
         console.error('Erro ao chamar IA:', data.error)
+        broadcast('ai_thinking', { userId, active: false })
       }
+    } catch {
+      broadcast('ai_thinking', { userId, active: false })
     } finally {
       setLoadingAI(false)
     }
@@ -44,14 +56,11 @@ export default function MessageInput({ roomId, userId }: Props) {
     e.preventDefault()
     const trimmed = text.trim()
     if (!trimmed) return
-
     setText('')
 
     if (trimmed.startsWith('/ai')) {
       const userMessage = trimmed.replace(/^\/ai\s*/, '').trim()
-      if (userMessage) {
-        await sendRegularMessage(userMessage)
-      }
+      if (userMessage) await sendRegularMessage(userMessage)
       await requestAI()
     } else {
       await sendRegularMessage(trimmed)
@@ -68,10 +77,10 @@ export default function MessageInput({ roomId, userId }: Props) {
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-3">
       <form onSubmit={handleSubmit} className="flex items-end gap-2">
-        <div className="flex-1 relative">
+        <div className="flex-1">
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => { setText(e.target.value); emitTyping() }}
             onKeyDown={handleKeyDown}
             placeholder="Escreva uma mensagem… ou use /ai para consultar a IA"
             rows={1}
@@ -90,18 +99,9 @@ export default function MessageInput({ roomId, userId }: Props) {
           {loadingAI ? (
             <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           ) : (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           )}
         </button>
@@ -111,18 +111,8 @@ export default function MessageInput({ roomId, userId }: Props) {
           disabled={!text.trim()}
           className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 text-white disabled:text-gray-400 transition"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </button>
       </form>
