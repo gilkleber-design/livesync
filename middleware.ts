@@ -29,7 +29,11 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user && request.nextUrl.pathname.startsWith('/chat')) {
+  if (
+    !user &&
+    (request.nextUrl.pathname.startsWith('/chat') ||
+      request.nextUrl.pathname.startsWith('/invite'))
+  ) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -44,5 +48,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/chat/:path*', '/login', '/signup'],
+  matcher: ['/chat/:path*', '/invite/:path*', '/login', '/signup'],
 }

@@ -8,15 +8,19 @@ export default async function ChatLayout({
   children: React.ReactNode
 }) {
   const supabase = createServerSupabaseClient()
-  const { data: rooms } = await supabase
-    .from('rooms')
-    .select('id, name')
-    .order('created_at', { ascending: true })
+
+  const [{ data: { user } }, { data: rooms }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('rooms')
+      .select('id, name, invite_token')
+      .order('created_at', { ascending: true }),
+  ])
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
       <Suspense>
-        <Sidebar rooms={rooms ?? []} />
+        <Sidebar rooms={rooms ?? []} currentUserId={user?.id ?? ''} />
       </Suspense>
       <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
     </div>
