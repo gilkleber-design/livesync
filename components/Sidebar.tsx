@@ -133,7 +133,7 @@ export default function Sidebar({ rooms: initialRooms, currentUserId, onClose }:
 
   return (
     <>
-      <aside className="w-64 flex flex-col bg-gray-900 text-white shrink-0">
+      <aside className="w-64 h-full flex flex-col bg-gray-900 text-white shrink-0">
         <div className="px-5 py-4 border-b border-gray-700">
           <h1 className="text-xl font-bold tracking-tight">LiveSync</h1>
           <p className="text-xs text-gray-400 mt-0.5">Chat com IA em tempo real</p>
