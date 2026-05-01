@@ -11,7 +11,14 @@ export async function getAIResponse(messages: MessageContext[]): Promise<string>
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    systemInstruction: `Você é um assistente técnico direto. Regras imutáveis:
+- PROIBIDO: introduções ("Ah, que ideia fascinante"), conclusões motivacionais, avisos éticos óbvios.
+- FORMATO: apenas tópicos diretos, código e ações necessárias.
+- TOM: curto, técnico, seco. Humor sagaz somente para criticar conduta errada.
+- REGRA DE OURO: entregue apenas o que é acionável. Mais de 3 parágrafos = resposta errada.`,
+  })
 
   const history = messages.slice(0, -1).map((m) => ({
     role: m.role,
