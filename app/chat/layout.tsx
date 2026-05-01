@@ -1,12 +1,7 @@
-import { Suspense } from 'react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
-import Sidebar from '@/components/Sidebar'
+import ChatLayoutClient from '@/components/ChatLayoutClient'
 
-export default async function ChatLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function ChatLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerSupabaseClient()
 
   const [{ data: { user } }, { data: rooms }] = await Promise.all([
@@ -18,11 +13,8 @@ export default async function ChatLayout({
   ])
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
-      <Suspense>
-        <Sidebar rooms={rooms ?? []} currentUserId={user?.id ?? ''} />
-      </Suspense>
-      <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
-    </div>
+    <ChatLayoutClient rooms={rooms ?? []} currentUserId={user?.id ?? ''}>
+      {children}
+    </ChatLayoutClient>
   )
 }

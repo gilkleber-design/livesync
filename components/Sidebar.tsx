@@ -14,9 +14,10 @@ type Room = {
 type Props = {
   rooms: Room[]
   currentUserId: string
+  onClose?: () => void
 }
 
-export default function Sidebar({ rooms: initialRooms, currentUserId }: Props) {
+export default function Sidebar({ rooms: initialRooms, currentUserId, onClose }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeRoomId = searchParams.get('roomId')
@@ -174,7 +175,7 @@ export default function Sidebar({ rooms: initialRooms, currentUserId }: Props) {
                   </form>
                 ) : (
                   <button
-                    onClick={() => router.push(`/chat?roomId=${room.id}`)}
+                    onClick={() => { router.push(`/chat?roomId=${room.id}`); onClose?.() }}
                     className={`flex-1 text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       activeRoomId === room.id
                         ? 'bg-indigo-600 text-white'

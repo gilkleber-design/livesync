@@ -11,11 +11,10 @@ export default async function InvitePage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login`)
 
-  const { data: room } = await supabase
-    .from('rooms')
-    .select('id, name')
-    .eq('invite_token', params.token)
-    .single()
+  const { data: rooms } = await supabase
+    .rpc('get_room_by_invite_token', { token: params.token })
+
+  const room = rooms?.[0] ?? null
 
   if (!room) {
     return (

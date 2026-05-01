@@ -117,7 +117,7 @@ export default function MessageInput({ roomId, userId, broadcast }: Props) {
         </button>
       </form>
 
-      <p className="text-xs text-gray-400 mt-1.5 px-1">
+      <p className="hidden sm:block text-xs text-gray-400 mt-1.5 px-1">
         Enter para enviar · Shift+Enter para nova linha · /ai para consultar a IA
       </p>
     </div>
