@@ -13,7 +13,7 @@ export default async function ChatLayout({
     supabase.auth.getUser(),
     supabase
       .from('rooms')
-      .select('id, name, invite_token')
+      .select('id, name, invite_token, owner_id')
       .order('created_at', { ascending: true }),
   ])
 
