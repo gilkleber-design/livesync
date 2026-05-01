@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import HardRedirect from '@/components/HardRedirect'
 
 type Props = {
   params: { token: string }
@@ -33,5 +34,5 @@ export default async function InvitePage({ params }: Props) {
     .from('room_members')
     .upsert({ room_id: room.id, user_id: user.id }, { onConflict: 'room_id,user_id' })
 
-  redirect(`/chat?roomId=${room.id}`)
+  return <HardRedirect url={`/chat?roomId=${room.id}`} />
 }
