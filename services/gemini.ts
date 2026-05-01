@@ -1,17 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY não está definida nas variáveis de ambiente')
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-
 export type MessageContext = {
   role: 'user' | 'model'
   content: string
 }
 
 export async function getAIResponse(messages: MessageContext[]): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY não está definida nas variáveis de ambiente')
+  }
+
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
   const history = messages.slice(0, -1).map((m) => ({
